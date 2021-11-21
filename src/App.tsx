@@ -102,7 +102,7 @@ function App() {
               }
             }}
           >
-            Dark
+            Dark Mode
           </button>
         </div>
         <h1>How do you say "GIF"?</h1>
@@ -115,7 +115,7 @@ function App() {
 
         {currentAccount && (
           <div>
-            <h2>Place your vote! 👇</h2>
+            <h2>Submit a vote!&nbsp;👇</h2>
           </div>
         )}
         <div className="button-container">
@@ -149,9 +149,7 @@ function App() {
             </div>
           )}
 
-          <p>
-            <i>Powered by Ethereum</i>
-          </p>
+          <p className="powered">Powered by Ethereum</p>
         </div>
       </div>
     </div>

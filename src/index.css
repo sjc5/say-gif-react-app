@@ -3,7 +3,7 @@
 * {
   margin: 0;
   padding: 0;
-  font-size: calc(16px + 0.5vw + 0.5vh);
+  font-size: calc(10px + 0.75vw + 0.75vh);
   font-family: "Roboto Mono", monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
