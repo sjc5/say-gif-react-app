@@ -4,9 +4,17 @@ import { abi } from "./utils/GifPronunciationPortal.json";
 import "./App.css";
 
 function App() {
-  const [dark, setDark] = useState(
-    JSON.parse(localStorage.getItem("dark") || "false"),
-  );
+  const getDark = () => {
+    let dark;
+    try {
+      dark = JSON.parse(localStorage.getItem("dark") || "false");
+    } catch (e) {
+      dark = false;
+    }
+    return dark;
+  };
+
+  const [dark, setDark] = useState(getDark());
   const [currentAccount, setCurrentAccount] = useState("");
   const [softTotal, setSoftTotal] = useState(null);
   const [hardTotal, setHardTotal] = useState(null);
