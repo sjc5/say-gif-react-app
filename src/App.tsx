@@ -13,7 +13,7 @@ function App() {
 
   const checkIfWalletIsConnected = async () => {
     try {
-      const { ethereum } = window;
+      const { ethereum }: any = window;
 
       if (!ethereum) {
         console.log("make sure you have metamask!");
@@ -38,7 +38,7 @@ function App() {
 
   const connectWallet = async () => {
     try {
-      const { ethereum } = window;
+      const { ethereum }: any = window;
 
       if (!ethereum) {
         alert("You need to install MetaMask!");
@@ -59,7 +59,7 @@ function App() {
   const getTotals = async () => {
     console.log("running");
     try {
-      const { ethereum } = window;
+      const { ethereum }: any = window;
 
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
@@ -105,7 +105,7 @@ function App() {
             Dark Mode
           </button>
         </div>
-        <h1>How do you say "GIF"?</h1>
+        <h1>How Do You Say "GIF"?</h1>
 
         {!currentAccount && (
           <div>
