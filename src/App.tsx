@@ -4,6 +4,9 @@ import { abi } from "./utils/GifPronunciationPortal.json";
 import "./App.css";
 
 function App() {
+  const [dark, setDark] = useState(
+    JSON.parse(localStorage.getItem("dark") || "false"),
+  );
   const [currentAccount, setCurrentAccount] = useState("");
   const [softTotal, setSoftTotal] = useState(null);
   const [hardTotal, setHardTotal] = useState(null);
@@ -48,14 +51,13 @@ function App() {
 
       console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
-
-      getTotals();
     } catch (e) {
       console.warn(e);
     }
   };
 
   const getTotals = async () => {
+    console.log("running");
     try {
       const { ethereum } = window;
 
@@ -81,27 +83,29 @@ function App() {
   };
 
   useEffect(() => {
-    checkIfWalletIsConnected();
+    checkIfWalletIsConnected().then(() => getTotals());
   }, []);
 
   return (
-    <div id="App">
+    <div id="App" className={dark ? "dark" : ""}>
       <div className="container">
         <div className="top-buttons">
           <button
+            className="small-button"
             onClick={() => {
-              const classList = document.getElementById("App")?.classList;
-              if (classList?.contains("dark")) {
-                classList?.remove("dark");
+              if (dark) {
+                setDark(false);
+                localStorage.setItem("dark", JSON.stringify(false));
               } else {
-                classList?.add("dark");
+                setDark(true);
+                localStorage.setItem("dark", JSON.stringify(true));
               }
             }}
           >
-            Dark Mode
+            Dark
           </button>
         </div>
-        <h1>How do you say 'GIF'?</h1>
+        <h1>How do you say "GIF"?</h1>
 
         {!currentAccount && (
           <div>
@@ -116,18 +120,21 @@ function App() {
         )}
         <div className="button-container">
           <button className="vote-button" disabled={!currentAccount}>
-            🥜 JIF<p className="explanation">(like "giraffe")</p>
+            🦒 JIF<p className="explanation">(like "giraffe")</p>
             {currentAccount && (
-              <p>
-                total votes: <b>{softTotal}</b>
+              <p className="votes">
+                <span>total votes:</span>{" "}
+                <span>
+                  <b>{softTotal}</b>
+                </span>
               </p>
             )}
           </button>
           <button className="vote-button" disabled={!currentAccount}>
-            🎁 GIF<p className="explanation">(like "gorilla")</p>
+            🦍 GIF<p className="explanation">(like "gorilla")</p>
             {currentAccount && (
-              <p>
-                total votes: <b>{hardTotal}</b>
+              <p className="votes">
+                <span>total votes:</span> <b>{hardTotal}</b>
               </p>
             )}
           </button>
@@ -136,7 +143,7 @@ function App() {
           {currentAccount && (
             <div>
               <div className="info">
-                You are logged in as:{" "}
+                You are connected as:{" "}
                 <p className="address">{currentAccount}</p>
               </div>
             </div>

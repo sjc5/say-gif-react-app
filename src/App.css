@@ -86,13 +86,11 @@ button:focus {
 
 button:hover {
   transform: scale(1.03);
-  filter: drop-shadow(7px 7px 12px #7772);
   opacity: 0.95;
 }
 
 button:active {
   transform: scale(1);
-  filter: none;
   opacity: 1;
 }
 
@@ -103,6 +101,11 @@ button:disabled:active {
   cursor: default;
   opacity: 0.35;
   transition: none;
+}
+
+.small-button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
 }
 
 .button-container {
@@ -122,9 +125,20 @@ button:disabled:active {
   border-radius: 1rem;
 }
 
-.explanation {
+.explanation,
+.votes {
   font-size: 40%;
+}
+
+.explanation {
   opacity: 0.7;
+}
+
+.votes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  justify-content: center;
 }
 
 button p {
