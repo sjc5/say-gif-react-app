@@ -38,7 +38,7 @@ function App() {
       const { ethereum } = window;
 
       if (!ethereum) {
-        alert("Get MetaMask!");
+        alert("You need to install MetaMask!");
         return;
       }
 
@@ -48,6 +48,8 @@ function App() {
 
       console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
+
+      getTotals();
     } catch (e) {
       console.warn(e);
     }
@@ -80,46 +82,69 @@ function App() {
 
   useEffect(() => {
     checkIfWalletIsConnected();
-    getTotals();
   }, []);
 
   return (
     <div id="App">
-      <div>
-        <button
-          onClick={() => {
-            const classList = document.getElementById("App")?.classList;
-            if (classList?.contains("dark")) {
-              classList?.remove("dark");
-            } else {
-              classList?.add("dark");
-            }
-          }}
-        >
-          dark
-        </button>
-      </div>
-      <h1>How do you pronounce 'GIF'?</h1>
-      {!currentAccount && (
-        <button onClick={connectWallet}>Connect MetaMask Wallet</button>
-      )}
-      {currentAccount && (
-        <div>
-          <div className="info">You are logged in as: {currentAccount}</div>
+      <div className="container">
+        <div className="top-buttons">
+          <button
+            onClick={() => {
+              const classList = document.getElementById("App")?.classList;
+              if (classList?.contains("dark")) {
+                classList?.remove("dark");
+              } else {
+                classList?.add("dark");
+              }
+            }}
+          >
+            Dark Mode
+          </button>
+        </div>
+        <h1>How do you say 'GIF'?</h1>
 
-          {/* <button onClick={castSoftVote}>Cast Soft Vote</button> */}
+        {!currentAccount && (
+          <div>
+            <button onClick={connectWallet}>Connect MetaMask to Vote!</button>
+          </div>
+        )}
+
+        {currentAccount && (
+          <div>
+            <h2>Place your vote! 👇</h2>
+          </div>
+        )}
+        <div className="button-container">
+          <button className="vote-button" disabled={!currentAccount}>
+            🥜 JIF<p className="explanation">(like "giraffe")</p>
+            {currentAccount && (
+              <p>
+                total votes: <b>{softTotal}</b>
+              </p>
+            )}
+          </button>
+          <button className="vote-button" disabled={!currentAccount}>
+            🎁 GIF<p className="explanation">(like "gorilla")</p>
+            {currentAccount && (
+              <p>
+                total votes: <b>{hardTotal}</b>
+              </p>
+            )}
+          </button>
         </div>
-      )}
-      <div className="button-container">
         <div>
-          <button>🥜 JIF</button>
-          <p>soft g, like "giraffe"</p>
-          <div>Soft Votes: {softTotal}</div>
-        </div>
-        <div>
-          <button>🎁 GIF</button>
-          <p>hard g, like "girlfriend"</p>
-          <div>Hard Votes: {hardTotal}</div>
+          {currentAccount && (
+            <div>
+              <div className="info">
+                You are logged in as:{" "}
+                <p className="address">{currentAccount}</p>
+              </div>
+            </div>
+          )}
+
+          <p>
+            <i>Powered by Ethereum</i>
+          </p>
         </div>
       </div>
     </div>

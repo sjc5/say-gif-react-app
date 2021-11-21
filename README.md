@@ -1,1 +1,1 @@
-# how-do-you-pronounce-gif
+# how-do-you-say-gif

@@ -1,54 +1,87 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;700&display=swap");
-
-* {
-  margin: 0;
-  padding: 0;
-  font-size: calc(16px + 0.5vw + 0.5vh);
-  font-family: "Roboto Mono", monospace;
-}
-
 html,
 body,
 #root,
 #App {
   height: 100%;
+  overflow: hidden;
 }
 
 #App {
   text-align: center;
   --fg: #232723;
   --bg: #e0e9e0;
+  --padding: calc(2vh + 2vw);
+  --blue: #47a;
   background-color: var(--bg);
   color: var(--fg);
   display: flex;
-  flex-direction: column;
-  gap: calc(1rem + 1vh + 1vw);
-  padding: 1rem;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
 }
 
 #App.dark {
   --fg: #e0e9e0;
   --bg: #232723;
+  --blue: #7ad;
+}
+
+.container {
+  padding: var(--padding);
+  display: flex;
+  flex-direction: column;
+  gap: calc(1rem + 1vh + 1vw);
+  width: 100%;
+  max-height: 100%;
+  max-width: calc(600px + 20vw);
+}
+
+.top-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 h1 {
   font-size: 150%;
 }
 
-.info {
+h2 {
+  font-size: 125%;
+  font-weight: normal;
+}
+
+.info,
+.address {
   font-size: 0.8rem;
+}
+
+.address {
+  margin-top: 0.3rem;
+  font-weight: bold;
+}
+
+.info {
   opacity: 0.8;
   word-wrap: break-word;
+  margin-bottom: 1rem;
 }
 
 button {
-  border-radius: 12px;
-  border: 5px solid var(--fg);
-  font-size: 200%;
-  font-weight: bold;
   transition: all ease 0.1s;
-  padding: 1rem;
   opacity: 0.9;
+  cursor: pointer;
+  background-color: var(--fg);
+  color: var(--bg);
+  border: 5px solid var(--bg);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+}
+
+button:focus {
+  border: 5px solid var(--blue);
 }
 
 button:hover {
@@ -63,9 +96,37 @@ button:active {
   opacity: 1;
 }
 
+button:disabled,
+button:disabled:hover,
+button:disabled:active {
+  transform: scale(1);
+  cursor: default;
+  opacity: 0.35;
+  transition: none;
+}
+
 .button-container {
   display: flex;
   gap: 2rem;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+.vote-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 200%;
+  padding: 1rem 1.4rem;
+  border-radius: 1rem;
+}
+
+.explanation {
+  font-size: 40%;
+  opacity: 0.7;
+}
+
+button p {
+  font-weight: normal;
 }
