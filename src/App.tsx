@@ -1,9 +1,24 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { abi } from "./utils/GifPronunciationPortal.json";
-import "./App.css";
 
 function App() {
+  // HELPERS
+  const getEthereum = () => {
+    const { ethereum }: any = window;
+    return ethereum;
+  };
+
+  const getContract = () => {
+    const provider = new ethers.providers.Web3Provider(getEthereum());
+    const signer = provider.getSigner();
+    return new ethers.Contract(
+      "0xeDeb5ECb0e1AFC92c28d22aFdD4659418c3a3225",
+      abi,
+      signer,
+    );
+  };
+
   const getDark = () => {
     let dark;
     try {
@@ -14,23 +29,25 @@ function App() {
     return dark;
   };
 
+  // STATE
   const [dark, setDark] = useState(getDark());
   const [currentAccount, setCurrentAccount] = useState("");
   const [softTotal, setSoftTotal] = useState(null);
   const [hardTotal, setHardTotal] = useState(null);
+  const [status, setStatus] = useState("");
+  const [isMining, setIsMining] = useState(false);
 
+  // LOGIC
   const checkIfWalletIsConnected = async () => {
     try {
-      const { ethereum }: any = window;
-
-      if (!ethereum) {
+      if (!getEthereum()) {
         console.log("make sure you have metamask!");
         return;
       } else {
-        console.log("we have the ethereum object", ethereum);
+        console.log("we have the ethereum object", getEthereum());
       }
 
-      const accounts = await ethereum.request({ method: "eth_accounts" });
+      const accounts = await getEthereum().request({ method: "eth_accounts" });
 
       if (accounts.length !== 0) {
         const account = accounts[0];
@@ -46,14 +63,12 @@ function App() {
 
   const connectWallet = async () => {
     try {
-      const { ethereum }: any = window;
-
-      if (!ethereum) {
+      if (!getEthereum()) {
         alert("You need to install MetaMask!");
         return;
       }
 
-      const accounts = await ethereum.request({
+      const accounts = await getEthereum().request({
         method: "eth_requestAccounts",
       });
 
@@ -65,22 +80,11 @@ function App() {
   };
 
   const getTotals = async () => {
-    console.log("running");
     try {
-      const { ethereum }: any = window;
-
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const gifPronunciationPortalContract = new ethers.Contract(
-          "0xeDeb5ECb0e1AFC92c28d22aFdD4659418c3a3225",
-          abi,
-          signer,
-        );
-
-        let softs = await gifPronunciationPortalContract.getSoftTotal();
+      if (getEthereum() && currentAccount) {
+        let softs = await getContract().getSoftTotal();
         setSoftTotal(softs.toNumber());
-        let hards = await gifPronunciationPortalContract.getHardTotal();
+        let hards = await getContract().getHardTotal();
         setHardTotal(hards.toNumber());
       } else {
         console.log("Ethereum object doesn't exist");
@@ -90,10 +94,40 @@ function App() {
     }
   };
 
+  const castVote = async (type: string) => {
+    try {
+      if (getEthereum()) {
+        const transaction =
+          type === "soft"
+            ? await getContract().castSoftVote()
+            : type === "hard"
+            ? await getContract().castHardVote()
+            : null;
+
+        if (transaction === null) return;
+
+        setStatus("Casting your vote...");
+        setIsMining(true);
+
+        await transaction?.wait().then(() => {
+          setStatus("Success! Your vote was counted.");
+          setIsMining(false);
+          getTotals();
+        });
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  // HOOKS
   useEffect(() => {
     checkIfWalletIsConnected().then(() => getTotals());
-  }, []);
+  }, [currentAccount]);
 
+  // UI
   return (
     <div id="App" className={dark ? "dark" : ""}>
       <div className="container">
@@ -127,18 +161,23 @@ function App() {
           </div>
         )}
         <div className="button-container">
-          <button className="vote-button" disabled={!currentAccount}>
+          <button
+            className="vote-button"
+            onClick={() => castVote("soft")}
+            disabled={!currentAccount || isMining}
+          >
             🦒 JIF<p className="explanation">(like "giraffe")</p>
             {currentAccount && (
               <p className="votes">
-                <span>total votes:</span>{" "}
-                <span>
-                  <b>{softTotal}</b>
-                </span>
+                <span>total votes:</span> <b>{softTotal}</b>
               </p>
             )}
           </button>
-          <button className="vote-button" disabled={!currentAccount}>
+          <button
+            className="vote-button"
+            onClick={() => castVote("hard")}
+            disabled={!currentAccount || isMining}
+          >
             🦍 GIF<p className="explanation">(like "gorilla")</p>
             {currentAccount && (
               <p className="votes">
@@ -147,6 +186,7 @@ function App() {
             )}
           </button>
         </div>
+        {status}
         <div>
           {currentAccount && (
             <div>
