@@ -188,7 +188,7 @@ function App() {
 
         {!currentAccount && (
           <div>
-            <button onClick={connectWallet}>Connect MetaMask to Vote!</button>
+            <button onClick={connectWallet}>Vote With MetaMask</button>
           </div>
         )}
 
@@ -282,21 +282,22 @@ function App() {
             </ul>
           </div>
         )}
-
-        <p className="powered">
-          <a
-            href={"https://etherscan.io/address/" + contractAddress}
-            target="_blank"
-          >
-            View Contract on Etherscan
-          </a>
-        </p>
-        <p className="powered">
-          Made by{" "}
-          <a href="https://twitter.com/samcookdev" target="_blank">
-            @samcookdev
-          </a>
-        </p>
+        <div>
+          <p className="powered">
+            <a
+              href={"https://etherscan.io/address/" + contractAddress}
+              target="_blank"
+            >
+              View Contract on Etherscan
+            </a>
+          </p>
+          <p className="powered mt">
+            Made by{" "}
+            <a href="https://twitter.com/samcookdev" target="_blank">
+              @samcookdev
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );
