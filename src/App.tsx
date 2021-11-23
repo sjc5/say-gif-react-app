@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { abi } from "./utils/GifPronunciationPortal.json";
 
 function App() {
-  const contractAddress = "0x1A1A9e1dC6a2d99AA12821d22c75B917b0C60E5C";
+  const contractAddress = "0x58ECeC477142Fd4F03E9B25a4bB8b61E48A0BC03";
 
   // HELPERS
   const getEthereum = () => {
