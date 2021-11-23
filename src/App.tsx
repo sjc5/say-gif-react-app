@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { abi } from "./utils/GifPronunciationPortal.json";
 
 function App() {
-  const contractAddress = "0x58ECeC477142Fd4F03E9B25a4bB8b61E48A0BC03";
+  const contractAddress = "0xA8bCB48751C5A13c858cE432ad7672469e4ec478";
 
   // HELPERS
   const getEthereum = () => {
@@ -21,13 +21,20 @@ function App() {
     let dark;
     try {
       dark = JSON.parse(localStorage.getItem("dark") || "false");
-    } catch (e) {
+    } catch (e: any) {
       dark = false;
     }
     return dark;
   };
 
   const isDisabled = () => !currentAccount || isMining || !name;
+
+  const getCleanVote = (vote: any) => ({
+    address: vote.voter,
+    timestamp: new Date(vote.timestamp * 1000),
+    name: vote.name,
+    vote: vote.vote,
+  });
 
   // STATE
   const [dark, setDark] = useState(getDark());
@@ -36,7 +43,7 @@ function App() {
   const [hardTotal, setHardTotal] = useState(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isMining, setIsMining] = useState(false);
-  const [votes, setVotes] = useState([]);
+  const [votes, setVotes] = useState([] as any[]);
   const [name, setName] = useState("");
 
   // LOGIC
@@ -59,8 +66,8 @@ function App() {
       } else {
         console.log("no authorized account found");
       }
-    } catch (e) {
-      console.warn(e);
+    } catch (e: any) {
+      alert(e.message);
     }
   };
 
@@ -77,8 +84,8 @@ function App() {
 
       console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
-    } catch (e) {
-      console.warn(e);
+    } catch (e: any) {
+      alert(e.message);
     }
   };
 
@@ -92,20 +99,19 @@ function App() {
       } else {
         console.log("Ethereum object doesn't exist");
       }
-    } catch (e) {
-      console.warn(e);
+    } catch (e: any) {
+      alert(e.message);
     }
   };
 
   const castVote = async (type: string, name: string) => {
     try {
       if (getEthereum()) {
-        const transaction =
-          type === "soft"
-            ? await getContract().castSoftVote(name)
-            : type === "hard"
-            ? await getContract().castHardVote(name)
-            : null;
+        const transaction = await getContract().castVote(
+          name,
+          type === "soft" ? true : false,
+          { gasLimit: 999999 },
+        );
 
         if (transaction === null) return;
 
@@ -121,8 +127,8 @@ function App() {
       } else {
         console.log("Ethereum object doesn't exist!");
       }
-    } catch (e) {
-      console.warn(e);
+    } catch (e: any) {
+      alert(e.message);
     }
   };
 
@@ -131,21 +137,12 @@ function App() {
       if (getEthereum()) {
         const votes = await getContract().getAllVotes();
 
-        setVotes(
-          votes.map((vote: any) => {
-            return {
-              address: vote.voter,
-              timestamp: new Date(vote.timestamp * 1000),
-              name: vote.name,
-              vote: vote.vote,
-            };
-          }),
-        );
+        setVotes(votes.map((vote: any) => getCleanVote(vote)));
       } else {
         console.log("Ethereum object doesn't exist");
       }
-    } catch (e) {
-      console.warn(e);
+    } catch (e: any) {
+      alert(e.message);
     }
   };
 
@@ -155,6 +152,26 @@ function App() {
       getTotals();
     });
   }, [currentAccount]);
+
+  useEffect(() => {
+    const onNewTransaction = (
+      from: any,
+      name: string,
+      vote: string,
+      timestamp: number,
+    ) => {
+      console.log("NewTransaction", from, name, vote, timestamp);
+      setVotes((prevState: any[]) => [
+        ...prevState,
+        {
+          address: from,
+          timestamp: new Date(timestamp * 1000),
+          name: name,
+          vote: vote,
+        },
+      ]);
+    };
+  });
 
   // UI
   return (
