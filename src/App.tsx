@@ -201,12 +201,16 @@ function App() {
             <p className="address">
               <b>{currentAccount}</b>
             </p>
+            <div className="info mt">
+              Be sure to use the Rinkeby Ethereum Testnet!
+            </div>
           </div>
         )}
 
         {!currentAccount && (
           <div>
             <button onClick={connectWallet}>Vote With MetaMask</button>
+            <div className="info mt">(Using the Rinkeby Ethereum Testnet)</div>
           </div>
         )}
 
@@ -306,13 +310,27 @@ function App() {
               href={"https://rinkeby.etherscan.io/address/" + contractAddress}
               target="_blank"
             >
-              Rinkeby Ethereum Testnet Contract
+              etherscan
+            </a>
+            {"  / "}
+            <a
+              href="https://github.com/sjc5/say-gif-smart-contract"
+              target="_blank"
+            >
+              solidity code
+            </a>
+            {" / "}
+            <a href="https://github.com/sjc5/say-gif-react-app" target="_blank">
+              react code
             </a>
           </p>
-          <p className="powered mt">
-            Made by{" "}
+          <p className="powered mt mb">
+            <a href="https://samcook.cc" target="_blank">
+              samcook.cc
+            </a>
+            {" / "}
             <a href="https://twitter.com/samcookdev" target="_blank">
-              @samcookdev
+              twitter
             </a>
           </p>
         </div>
