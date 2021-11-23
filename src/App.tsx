@@ -110,7 +110,7 @@ function App() {
         const transaction = await getContract().castVote(
           name,
           type === "soft" ? true : false,
-          { gasLimit: 999999 },
+          { gasLimit: 300000 },
         );
 
         if (transaction === null) return;
@@ -120,7 +120,6 @@ function App() {
         await transaction?.wait().then(() => {
           setIsSuccess(true);
           setIsMining(false);
-          getTotals();
           getAllVotes();
           setName("");
         });
@@ -154,24 +153,26 @@ function App() {
   }, [currentAccount]);
 
   useEffect(() => {
-    const onNewTransaction = (
-      from: any,
-      name: string,
-      vote: string,
-      timestamp: number,
-    ) => {
-      console.log("NewTransaction", from, name, vote, timestamp);
-      setVotes((prevState: any[]) => [
-        ...prevState,
-        {
-          address: from,
-          timestamp: new Date(timestamp * 1000),
-          name: name,
-          vote: vote,
-        },
-      ]);
+    const onNewVote = () => {
+      getAllVotes();
     };
-  });
+
+    if (getEthereum()) {
+      getContract().on("NewVote", onNewVote);
+    }
+
+    return () => {
+      if (getContract()) {
+        getContract().off("NewVote", onNewVote);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (currentAccount) {
+      getTotals();
+    }
+  }, [votes]);
 
   // UI
   return (
@@ -276,8 +277,8 @@ function App() {
             <h3>Latest Votes:</h3>
             <ul className="vote-list">
               {votes
-                .slice(0, 12)
                 .sort((a: any, b: any) => b.timestamp - a.timestamp)
+                .slice(0, 12)
                 .map((vote: any, index) => {
                   return (
                     <li key={index} className="vote">
@@ -302,10 +303,10 @@ function App() {
         <div>
           <p className="powered">
             <a
-              href={"https://etherscan.io/address/" + contractAddress}
+              href={"https://rinkeby.etherscan.io/address/" + contractAddress}
               target="_blank"
             >
-              View Contract on Etherscan
+              Rinkeby Ethereum Testnet Contract
             </a>
           </p>
           <p className="powered mt">
