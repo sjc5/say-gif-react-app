@@ -3,6 +3,8 @@ import { ethers } from "ethers";
 import { abi } from "./utils/GifPronunciationPortal.json";
 
 function App() {
+  const contractAddress = "0x1A1A9e1dC6a2d99AA12821d22c75B917b0C60E5C";
+
   // HELPERS
   const getEthereum = () => {
     const { ethereum }: any = window;
@@ -12,11 +14,7 @@ function App() {
   const getContract = () => {
     const provider = new ethers.providers.Web3Provider(getEthereum());
     const signer = provider.getSigner();
-    return new ethers.Contract(
-      "0xeDeb5ECb0e1AFC92c28d22aFdD4659418c3a3225",
-      abi,
-      signer,
-    );
+    return new ethers.Contract(contractAddress, abi, signer);
   };
 
   const getDark = () => {
@@ -29,6 +27,8 @@ function App() {
     return dark;
   };
 
+  const isDisabled = () => !currentAccount || isMining || !name;
+
   // STATE
   const [dark, setDark] = useState(getDark());
   const [currentAccount, setCurrentAccount] = useState("");
@@ -36,6 +36,8 @@ function App() {
   const [hardTotal, setHardTotal] = useState(null);
   const [status, setStatus] = useState("");
   const [isMining, setIsMining] = useState(false);
+  const [votes, setVotes] = useState([]);
+  const [name, setName] = useState("");
 
   // LOGIC
   const checkIfWalletIsConnected = async () => {
@@ -53,6 +55,7 @@ function App() {
         const account = accounts[0];
         console.log("Found an authorized account:", account);
         setCurrentAccount(account);
+        getAllVotes();
       } else {
         console.log("no authorized account found");
       }
@@ -94,14 +97,14 @@ function App() {
     }
   };
 
-  const castVote = async (type: string) => {
+  const castVote = async (type: string, name: string) => {
     try {
       if (getEthereum()) {
         const transaction =
           type === "soft"
-            ? await getContract().castSoftVote()
+            ? await getContract().castSoftVote(name)
             : type === "hard"
-            ? await getContract().castHardVote()
+            ? await getContract().castHardVote(name)
             : null;
 
         if (transaction === null) return;
@@ -113,6 +116,8 @@ function App() {
           setStatus("Success! Your vote was counted.");
           setIsMining(false);
           getTotals();
+          getAllVotes();
+          setName("");
         });
       } else {
         console.log("Ethereum object doesn't exist!");
@@ -122,9 +127,33 @@ function App() {
     }
   };
 
+  const getAllVotes = async () => {
+    try {
+      if (getEthereum()) {
+        const votes = await getContract().getAllVotes();
+
+        setVotes(
+          votes.map((vote: any) => {
+            return {
+              address: vote.voter,
+              timestamp: new Date(vote.timestamp * 1000),
+              name: vote.name,
+            };
+          }),
+        );
+      } else {
+        console.log("Ethereum object doesn't exist");
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
   // HOOKS
   useEffect(() => {
-    checkIfWalletIsConnected().then(() => getTotals());
+    checkIfWalletIsConnected().then(() => {
+      getTotals();
+    });
   }, [currentAccount]);
 
   // UI
@@ -147,6 +176,14 @@ function App() {
             Dark Mode
           </button>
         </div>
+        {currentAccount && (
+          <div className="info">
+            Connected as:{" "}
+            <p className="address">
+              <b>{currentAccount}</b>
+            </p>
+          </div>
+        )}
         <h1>How Do You Say "GIF"?</h1>
 
         {!currentAccount && (
@@ -155,50 +192,99 @@ function App() {
           </div>
         )}
 
-        {currentAccount && (
+        {status !== "Success! Your vote was counted." && (
+          <form>
+            {currentAccount && (
+              <>
+                <label htmlFor="name">
+                  <>{name ? "✅" : "1️⃣"}</> Enter your name:
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  maxLength={42}
+                  placeholder="Satoshi Nakamoto"
+                />
+
+                {name && (
+                  <p className="submit">
+                    {isMining
+                      ? "✅ Casting your vote..."
+                      : "2️⃣ Cast your vote 👇"}
+                  </p>
+                )}
+              </>
+            )}
+
+            <div className="button-container">
+              <button
+                className="vote-button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  castVote("soft", name);
+                }}
+                disabled={isDisabled()}
+              >
+                🦒 JIF<p className="explanation">(like "giraffe")</p>
+                {currentAccount && (
+                  <p className="votes">
+                    <span>total votes:</span> <b>{softTotal}</b>
+                  </p>
+                )}
+              </button>
+              <button
+                className="vote-button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  castVote("hard", name);
+                }}
+                disabled={isDisabled()}
+              >
+                🦍 GIF<p className="explanation">(like "gorilla")</p>
+                {currentAccount && (
+                  <p className="votes">
+                    <span>total votes:</span> <b>{hardTotal}</b>
+                  </p>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {votes.length > 0 && (
           <div>
-            <h2>Submit a vote!&nbsp;👇</h2>
+            <h3>Recent Voters:</h3>
+            <ul>
+              {votes
+                .slice(0, 12)
+                .sort((a: any, b: any) => b.timestamp - a.timestamp)
+                .map((vote: any, index) => {
+                  return (
+                    <li key={index}>
+                      <div>
+                        <b>{vote.name}</b> – {vote.timestamp.toLocaleString()}
+                        <div className="address">({vote.address})</div>
+                      </div>
+                    </li>
+                  );
+                })}
+            </ul>
           </div>
         )}
-        <div className="button-container">
-          <button
-            className="vote-button"
-            onClick={() => castVote("soft")}
-            disabled={!currentAccount || isMining}
-          >
-            🦒 JIF<p className="explanation">(like "giraffe")</p>
-            {currentAccount && (
-              <p className="votes">
-                <span>total votes:</span> <b>{softTotal}</b>
-              </p>
-            )}
-          </button>
-          <button
-            className="vote-button"
-            onClick={() => castVote("hard")}
-            disabled={!currentAccount || isMining}
-          >
-            🦍 GIF<p className="explanation">(like "gorilla")</p>
-            {currentAccount && (
-              <p className="votes">
-                <span>total votes:</span> <b>{hardTotal}</b>
-              </p>
-            )}
-          </button>
-        </div>
-        {status}
-        <div>
-          {currentAccount && (
-            <div>
-              <div className="info">
-                You are connected as:{" "}
-                <p className="address">{currentAccount}</p>
-              </div>
-            </div>
-          )}
 
-          <p className="powered">Powered by Ethereum</p>
-        </div>
+        <p className="powered">
+          <a href={"https://etherscan.io/address/" + contractAddress}>
+            view on Etherscan
+          </a>
+        </p>
+        <p className="powered">
+          made by{" "}
+          <a href="https://twitter.com/samcookdev" target="_blank">
+            @samcookdev
+          </a>
+        </p>
       </div>
     </div>
   );
