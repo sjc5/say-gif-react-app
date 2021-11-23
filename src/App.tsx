@@ -34,7 +34,7 @@ function App() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [softTotal, setSoftTotal] = useState(null);
   const [hardTotal, setHardTotal] = useState(null);
-  const [status, setStatus] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
   const [isMining, setIsMining] = useState(false);
   const [votes, setVotes] = useState([]);
   const [name, setName] = useState("");
@@ -109,11 +109,10 @@ function App() {
 
         if (transaction === null) return;
 
-        setStatus("Casting your vote...");
         setIsMining(true);
 
         await transaction?.wait().then(() => {
-          setStatus("Success! Your vote was counted.");
+          setIsSuccess(true);
           setIsMining(false);
           getTotals();
           getAllVotes();
@@ -138,6 +137,7 @@ function App() {
               address: vote.voter,
               timestamp: new Date(vote.timestamp * 1000),
               name: vote.name,
+              vote: vote.vote,
             };
           }),
         );
@@ -173,9 +173,10 @@ function App() {
               }
             }}
           >
-            Dark Mode
+            {dark ? "Dark " : "Light "} Mode
           </button>
         </div>
+        <h1>How Do You Say "GIF"?</h1>
         {currentAccount && (
           <div className="info">
             Connected as:{" "}
@@ -184,7 +185,6 @@ function App() {
             </p>
           </div>
         )}
-        <h1>How Do You Say "GIF"?</h1>
 
         {!currentAccount && (
           <div>
@@ -192,33 +192,30 @@ function App() {
           </div>
         )}
 
-        {status !== "Success! Your vote was counted." && (
-          <form>
-            {currentAccount && (
-              <>
-                <label htmlFor="name">
-                  <>{name ? "✅" : "1️⃣"}</> Enter your name:
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  maxLength={42}
-                  placeholder="Satoshi Nakamoto"
-                />
+        <form>
+          {currentAccount && !isMining && !isSuccess && (
+            <>
+              <label htmlFor="name">Enter your name:</label>
+              <input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={42}
+                placeholder="Satoshi Nakamoto"
+              />
 
-                {name && (
-                  <p className="submit">
-                    {isMining
-                      ? "✅ Casting your vote..."
-                      : "2️⃣ Cast your vote 👇"}
-                  </p>
-                )}
-              </>
-            )}
+              {name && <p className="submit">Cast your vote:</p>}
+            </>
+          )}
 
-            <div className="button-container">
+          {isMining && <p className="pending">Transaction pending...</p>}
+          {isSuccess && (
+            <p className="success">Success! Your vote was counted.</p>
+          )}
+
+          <div className="button-container">
+            <div>
               <button
                 className="vote-button"
                 onClick={(e) => {
@@ -228,12 +225,15 @@ function App() {
                 disabled={isDisabled()}
               >
                 🦒 JIF<p className="explanation">(like "giraffe")</p>
-                {currentAccount && (
-                  <p className="votes">
-                    <span>total votes:</span> <b>{softTotal}</b>
-                  </p>
-                )}
               </button>
+              {currentAccount && (
+                <div className="tally">
+                  <span>Votes:</span>{" "}
+                  <b>{(softTotal as any)?.toLocaleString("en-US")}</b>
+                </div>
+              )}
+            </div>
+            <div>
               <button
                 className="vote-button"
                 onClick={(e) => {
@@ -243,29 +243,38 @@ function App() {
                 disabled={isDisabled()}
               >
                 🦍 GIF<p className="explanation">(like "gorilla")</p>
-                {currentAccount && (
-                  <p className="votes">
-                    <span>total votes:</span> <b>{hardTotal}</b>
-                  </p>
-                )}
               </button>
+              {currentAccount && (
+                <div className="tally">
+                  <span>Votes:</span>{" "}
+                  <b>{(hardTotal as any)?.toLocaleString("en-US")}</b>
+                </div>
+              )}
             </div>
-          </form>
-        )}
+          </div>
+        </form>
 
         {votes.length > 0 && (
           <div>
-            <h3>Recent Voters:</h3>
-            <ul>
+            <h3>Latest Votes:</h3>
+            <ul className="vote-list">
               {votes
                 .slice(0, 12)
                 .sort((a: any, b: any) => b.timestamp - a.timestamp)
                 .map((vote: any, index) => {
                   return (
-                    <li key={index}>
+                    <li key={index} className="vote">
                       <div>
-                        <b>{vote.name}</b> – {vote.timestamp.toLocaleString()}
-                        <div className="address">({vote.address})</div>
+                        <span className="flex">
+                          <span className="big">
+                            {vote.vote === "soft" ? "🦒 " : "🦍 "}
+                          </span>
+                          <b>{vote.name}</b>
+                        </span>
+
+                        <div className="small">
+                          {vote.timestamp.toLocaleString()}
+                        </div>
                       </div>
                     </li>
                   );
@@ -275,12 +284,15 @@ function App() {
         )}
 
         <p className="powered">
-          <a href={"https://etherscan.io/address/" + contractAddress}>
-            view on Etherscan
+          <a
+            href={"https://etherscan.io/address/" + contractAddress}
+            target="_blank"
+          >
+            View Contract on Etherscan
           </a>
         </p>
         <p className="powered">
-          made by{" "}
+          Made by{" "}
           <a href="https://twitter.com/samcookdev" target="_blank">
             @samcookdev
           </a>
