@@ -68,7 +68,7 @@ function App() {
       }
     } catch (e: any) {
       alert(e.message);
-      location.reload();
+      console.log(e.message);
     }
   };
 
@@ -87,7 +87,7 @@ function App() {
       setCurrentAccount(accounts[0]);
     } catch (e: any) {
       alert(e.message);
-      location.reload();
+      console.log(e.message);
     }
   };
 
@@ -103,7 +103,7 @@ function App() {
       }
     } catch (e: any) {
       alert(e.message);
-      location.reload();
+      console.log(e.message);
     }
   };
 
@@ -131,7 +131,7 @@ function App() {
       }
     } catch (e: any) {
       alert(e.message);
-      location.reload();
+      console.log(e.message);
     }
   };
 
@@ -146,7 +146,7 @@ function App() {
       }
     } catch (e: any) {
       alert(e.message);
-      location.reload();
+      console.log(e.message);
     }
   };
 
