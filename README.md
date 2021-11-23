@@ -1,3 +1,8 @@
 # say-gif-react-app
 
-To run locally: `npm run dev`
+To hack on this locally, run:
+
+```
+npm i
+npm run dev
+```
