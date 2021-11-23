@@ -181,7 +181,7 @@ a:focus {
 }
 
 .small-button {
-  padding: 0.23rem 0.4rem;
+  padding: 0.23rem 0.53rem;
   font-size: 0.7rem;
 }
 
@@ -206,9 +206,10 @@ a:focus {
   font-size: 40%;
 }
 
-.powered {
+.footer {
   font-size: 0.5rem;
   font-style: italic;
+  line-height: 1.7;
 }
 
 .submit {

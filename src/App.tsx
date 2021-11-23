@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { abi } from "./utils/GifPronunciationPortal.json";
 
 function App() {
-  const contractAddress = "0xA8bCB48751C5A13c858cE432ad7672469e4ec478";
+  const contractAddress = "0x417D8d6139A77E03764d1575dd3683D374033Fd9";
 
   // HELPERS
   const getEthereum = () => {
@@ -68,6 +68,7 @@ function App() {
       }
     } catch (e: any) {
       alert(e.message);
+      location.reload();
     }
   };
 
@@ -86,6 +87,7 @@ function App() {
       setCurrentAccount(accounts[0]);
     } catch (e: any) {
       alert(e.message);
+      location.reload();
     }
   };
 
@@ -101,6 +103,7 @@ function App() {
       }
     } catch (e: any) {
       alert(e.message);
+      location.reload();
     }
   };
 
@@ -128,6 +131,7 @@ function App() {
       }
     } catch (e: any) {
       alert(e.message);
+      location.reload();
     }
   };
 
@@ -142,6 +146,7 @@ function App() {
       }
     } catch (e: any) {
       alert(e.message);
+      location.reload();
     }
   };
 
@@ -305,7 +310,7 @@ function App() {
           </div>
         )}
         <div>
-          <p className="powered">
+          <p className="footer">
             <a
               href={"https://rinkeby.etherscan.io/address/" + contractAddress}
               target="_blank"
@@ -324,7 +329,7 @@ function App() {
               react code
             </a>
           </p>
-          <p className="powered mt mb">
+          <p className="footer mt mb">
             <a href="https://samcook.cc" target="_blank">
               samcook.cc
             </a>
